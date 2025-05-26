@@ -2,6 +2,7 @@
 
 This is a Poetry Generation project based on BERT-UNILM. We use the `chinese-bert-wwm` as pre-trained model. You could get the pre-trained model from [here](https://huggingface.co/hfl/chinese-bert-wwm/tree/main).
 
+Our model has been published in [Huggingface Model Hub](https://huggingface.co/Wink-Snow/BERT-UNILM-for-Poetry-GEN).
 Welcome to star this repo if you like it!:dizzy:
 
 ## :rocket: Environment
