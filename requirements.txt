@@ -1,3 +1,9 @@
+# traing and inference requirements
 bert4torch==0.5.7
 transformers==4.35.2
 torchinfo==1.8.0
+
+# deployment requirements
+fastapi
+pydantic
+pydantic-core
