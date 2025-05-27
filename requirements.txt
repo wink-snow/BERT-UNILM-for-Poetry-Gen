@@ -9,6 +9,6 @@ torchinfo==1.8.0
 # pydantic-core
 
 # gradio app requirements
-gradio
+gradio==4.44.1
 torch
 torchvision
