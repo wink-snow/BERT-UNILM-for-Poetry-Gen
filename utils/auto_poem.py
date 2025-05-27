@@ -166,8 +166,13 @@ class AutoPoem(AutoRegressiveDecoder):
                             logits[i, token_candidate_id] -= self.penalties_rewards["not_rhyming_at_rhyme_pos_penalty"]
                 
                 if current_char_index_in_line == self.chars_per_line:
-                    is_last_line = (current_line_index == self.total_lines - 1)
-                    target_punc_id = self.period_id if is_last_line else self.comma_id
+                    is_period_line = (current_line_index == self.rhyming_lines_idx[0])
+                    for rhyme_line_idx in self.rhyming_lines_idx:
+                        if current_line_index == rhyme_line_idx:
+                            is_period_line = True
+                            break
+                    # is_last_line = (current_line_index == self.total_lines - 1)
+                    target_punc_id = self.period_id if is_period_line else self.comma_id
                     
                     if token_candidate_id == target_punc_id:
                         logits[i, token_candidate_id] += 5.0 
