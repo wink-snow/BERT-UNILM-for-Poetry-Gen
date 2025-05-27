@@ -8,7 +8,8 @@ initialization_error_message = None
 
 try:
     print("正在初始化 PoemMaster 以用于 Gradio 应用...")
-    poem_generator = PoemMaster()
+    poem_generator = PoemMaster(device='cpu')
+    # poem_generator = PoemMaster()
     print("PoemMaster 初始化成功。")
 except Exception as e:
     initialization_error_message = f"模型初始化失败: {e}\n详细错误信息请查看控制台。"
