@@ -227,9 +227,15 @@ class AutoPoem(AutoRegressiveDecoder):
         
         search_results = self.beam_search(inputs=[token_ids_tensor, segment_ids_tensor], top_k=top_k, top_p=top_p, temperature=temperature)
         
+        # if isinstance(search_results, tuple) and len(search_results) == 2:
+        #     output_ids = search_results[0][0] 
+        # else:
+        #     output_ids = search_results[0] 
         if isinstance(search_results, tuple) and len(search_results) == 2:
             output_ids = search_results[0][0] 
-        else:
-            output_ids = search_results[0] 
+        elif isinstance(search_results, list) and len(search_results) > 0:
+            output_ids = search_results[0]
+        else: 
+            output_ids = search_results[0] if isinstance(search_results, torch.Tensor) and search_results.ndim > 1 else search_results
 
         return self.tokenizer.decode(output_ids.cpu().numpy())
