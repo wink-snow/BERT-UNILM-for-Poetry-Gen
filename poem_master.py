@@ -15,18 +15,18 @@ class PoemMaster:
         ):
 
         self.device = device if device else ('cuda' if torch.cuda.is_available() else 'cpu')
-        print(f"Using device: {self.device}")
+        print(f"[PoemMaster] Using device: {self.device}")
 
-        print("Loading vocabulary...")
+        print("[PoemMaster] Loading vocabulary...")
         token_dict, keep_tokens = load_vocab(
             dict_path=dict_path,
             simplified=True,
             startswith=['[PAD]', '[UNK]', '[CLS]', '[SEP]'],
         )
         self.tokenizer = Tokenizer(token_dict, do_lower_case=True)
-        print("Vocabulary loaded.")
+        print("[PoemMaster] Vocabulary loaded.")
 
-        print("Building model...")
+        print("[PoemMaster] Building model...")
         self.model = build_transformer_model(
             config_path,
             checkpoint_path,
@@ -35,10 +35,10 @@ class PoemMaster:
             with_mlm=True,
             add_trainer=True 
         ).to(self.device)
-        print(f"Loading fine-tuned weights from {model_weights_path}...")
+        print(f"[PoemMaster] Loading fine-tuned weights from {model_weights_path}...")
         self.model.load_weights(model_weights_path)
         self.model.eval()
-        print("Model built and weights loaded.")
+        print("[PoemMaster] Model built and weights loaded.")
 
         self.poem_type_mapping = {
             "五言绝句": "jueju_5",
@@ -48,9 +48,9 @@ class PoemMaster:
         }
         
         self.autopoems: Dict[str, AutoPoem] = {}
-        print("Initializing AutoPoem instances...")
+        print("[PoemMaster] Initializing AutoPoem instances...")
         for pretty_name, internal_name in self.poem_type_mapping.items():
-            print(f"Initializing AutoPoem for {pretty_name} ({internal_name})...")
+            print(f"[PoemMaster] Initializing AutoPoem for {pretty_name} ({internal_name})...")
             self.autopoems[internal_name] = AutoPoem(
                 model=self.model,
                 tokenizer=self.tokenizer,
@@ -61,7 +61,7 @@ class PoemMaster:
                 device=self.device,
                 poem_type=internal_name
             )
-        print("All AutoPoem instances initialized.")
+        print("[PoemMaster] All AutoPoem instances initialized.")
 
     def generate(self, text_input: str, top_k: int = 8, top_p: float = 0.95, temperature: float = 1) -> str:
         """
@@ -92,8 +92,12 @@ class PoemMaster:
             # This case should not happen if __init__ is correct
             raise RuntimeError(f"未能找到格律 {internal_poem_type} 对应的 AutoPoem 实例。")
         
-        print(f"Generating poem with title='{title}', style='{poem_style_pretty}' (internal: '{internal_poem_type}')")
-        output = autopoem_instance.generate(text_input, top_k=top_k, top_p=top_p, temperature=temperature)
+        print(f"[PoemMaster] Generating poem with title='{title}', style='{poem_style_pretty}' (internal: '{internal_poem_type}')")
+        try:
+            output = autopoem_instance.generate(text_input, top_k=top_k, top_p=top_p, temperature=temperature)
+            print(f"[PoemMaster] Generation completed successfully.")
+        except Exception as e:
+            print(f"[PoemMaster] Error during generation: {e}")
         return output
 
 if __name__ == '__main__':

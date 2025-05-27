@@ -17,11 +17,12 @@ except Exception as e:
     traceback.print_exc()
     print("-----------------------------")
 
-def generate_poem_for_interface(poem_title: str, 
-                                poem_style_pretty: str, 
-                                top_k: int, 
-                                top_p: float, 
-                                temperature: float):
+def generate_poem(
+        poem_title: str, 
+        poem_style_pretty: str, 
+        top_k: int, 
+        top_p: float, 
+        temperature: float):
     """
     Gradio 调用的函数，用于生成诗歌。
     """
@@ -34,8 +35,8 @@ def generate_poem_for_interface(poem_title: str,
     # PoemMaster 的 generate 方法期望的输入格式是 "诗题&&格律"
     text_input = f"{poem_title.strip()}&&{poem_style_pretty}"
     
-    print(f"Gradio 请求: 诗题='{poem_title}', 格律='{poem_style_pretty}', Top-k={top_k}, Top-p={top_p}, Temperature={temperature}")
-    print(f"格式化后送入 PoemMaster 的输入: '{text_input}'")
+    print(f"[Gradio 请求] 诗题='{poem_title}', 格律='{poem_style_pretty}', Top-k={top_k}, Top-p={top_p}, Temperature={temperature}")
+    print(f"[Gradio 请求] 格式化后送入 PoemMaster 的输入: '{text_input}'")
 
     try:
         generated_poem = poem_generator.generate(
@@ -84,7 +85,7 @@ input_top_p = gr.Slider(
     value=0.95, 
     step=0.01, 
     label="Top-p (Nucleus Sampling)",
-    info="控制采样时考虑的累积概率阈值，值越小生成的文本越集中。"
+    info="控制采样时考虑的累积概率阈值"
 )
 input_temperature = gr.Slider(
     minimum=0.1, 
@@ -109,19 +110,95 @@ example_list = [
     ["黄鹤楼", "七言律诗", 8, 0.95, 0.9],
 ]
 
+
+custom_css = """
+.gradio-container { background-color: #fdfcf5; font-family: 'Segoe UI', Tahoma, sans-serif; }
+textarea, input { border-radius: 8px !important; }
+button.custom-btn { background-color: #6c5ce7 !important; color: white !important; }
+"""
+
+with gr.Blocks(css=custom_css, theme=gr.themes.Soft()) as app:
+    gr.Markdown("## 🪶 AI 古诗生成器")
+    gr.Markdown("输入一个诗题，选择格律，AI 将为您创作一首古诗。")
+
+    with gr.Row():
+        with gr.Column():
+            poem_title = gr.Textbox(
+                label="诗题 (Poem Title)", 
+                placeholder="例如：大雪满边城", 
+                elem_classes="custom-textbox"
+            )
+            poem_style = gr.Dropdown(
+                label="格律 (Poem Style)", 
+                choices=available_styles, 
+                value=default_style,
+                elem_classes="custom-dropdown"
+            )
+            top_k = gr.Slider(
+                minimum=1, 
+                maximum=50, 
+                value=8, 
+                step=1, 
+                label="Top-k",
+                info="控制采样时考虑的最高概率候选词的数量。",
+                elem_classes="custom-slider"
+            )
+            top_p = gr.Slider(
+                minimum=0.01, 
+                maximum=1.0, 
+                value=0.95, 
+                step=0.01, 
+                label="Top-p (Nucleus Sampling)",
+                info="控制采样时考虑的累积概率阈值",
+                elem_classes="custom-slider"
+            )
+            temperature = gr.Slider(
+                minimum=0.1, 
+                maximum=2.0, 
+                value=0.8, 
+                step=0.05, 
+                label="Temperature (随机性)",
+                info="控制生成文本的随机性，值越高越随机，越低越保守。",
+                elem_classes="custom-slider"
+            )
+            generate_btn = gr.Button("生成诗歌", elem_classes="custom-btn")
+        with gr.Column():
+            generated_poem = gr.Textbox(
+                label="生成的诗歌 (Generated Poem)", 
+                lines=10,               
+                interactive=False      
+            )
+
+    generate_btn.click(fn=generate_poem, inputs=[poem_title, poem_style, top_k, top_p, temperature], outputs=generated_poem)
+
+    gr.Examples(
+        examples=[
+            ["大雪满边城", "五言绝句", 8, 0.95, 0.8],
+            ["锦绣长安", "七言绝句", 10, 0.9, 0.75],
+            ["秋日即景", "五言律诗", 8, 0.95, 0.85],
+            ["黄鹤楼遇故人", "七言律诗", 8, 0.95, 0.9],
+        ],
+        inputs=[poem_title, poem_style, top_k, top_p, temperature],
+        outputs=generated_poem,
+        label="示例"
+    )
+
+    gr.Markdown("### 📌 模型说明")
+    gr.HTML("<p style='font-size:12px; color:#666;'>本模型基于 UNILM 与 bert4torch 微调。初次加载需时间。由于推理环境限制，耗时较长，请耐心等待。</p>")
+
 # --- Gradio Interface ---
 # 可选: gr.themes.Default(), gr.themes.Monochrome(), gr.themes.Soft(), gr.themes.Glass()
-theme = gr.themes.Soft(
-    primary_hue=gr.themes.colors.blue,
-    secondary_hue=gr.themes.colors.sky,
-).set(
-    # button_primary_background_fill="*primary_500",
-    # button_primary_text_color="white",
-)
+# theme = gr.themes.Soft(
+#     primary_hue=gr.themes.colors.blue,
+#     secondary_hue=gr.themes.colors.sky,
+# ).set(
+#     # button_primary_background_fill="*primary_500",
+#     # button_primary_text_color="white",
+# )
 
-
+'''
 interface = gr.Interface(
-    fn=generate_poem_for_interface,
+    fn=generate_poem,
     inputs=[
         input_poem_title, 
         input_poem_style, 
@@ -141,6 +218,7 @@ interface = gr.Interface(
     allow_flagging='never', 
     css="footer {display: none !important}"
 )
+'''
 
 if __name__ == '__main__':
     print("准备启动 Gradio 应用...")
@@ -148,6 +226,7 @@ if __name__ == '__main__':
         print(f"警告: PoemMaster 未能成功初始化。Gradio 界面将启动，但生成功能将显示错误信息。")
         print(f"初始化错误详情: {initialization_error_message}")
     
-    interface.launch()
+    # interface.launch()
     # interface.launch(share=True) 
     # interface.launch(server_name="0.0.0.0", server_port=7860)
+    app.launch()
