@@ -14,7 +14,7 @@ Welcome to star this repo if you like it!:dizzy:
 
 - [x] Generate Chinese poems with different styles
 - [x] Strength the `beam_search` method
-- [ ] Deploy the model to the web
+- [x] Backend api built by `fastapi`
 
 ## :hammer: Structure
 ```bash
@@ -34,6 +34,8 @@ Welcome to star this repo if you like it!:dizzy:
 ├─cipai.txt
 ├─task_seq2seq_auto_poem.py # Main script for training
 ├─test_seq2seq.py           # Main script for testing
+├─poem_master.py
+├─main_api.py               # Main script for api
 ├─requirements.txt
-├─README.md
+└─README_en.md
 ```
