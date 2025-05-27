@@ -10,3 +10,5 @@ torchinfo==1.8.0
 
 # gradio app requirements
 gradio
+torch
+torchvision
