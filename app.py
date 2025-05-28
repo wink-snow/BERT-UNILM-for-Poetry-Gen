@@ -93,7 +93,7 @@ else:
 
 custom_css = """
 .gradio-container { 
-    background-color: #fdfcf5; 
+    background-color: #fdfcf5 !important; /* Added !important for safety */
     font-family: 'Segoe UI', Tahoma, sans-serif, 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
 }
 textarea, input, .gradio-dropdown > div > input { 
@@ -101,7 +101,7 @@ textarea, input, .gradio-dropdown > div > input {
     border: 1px solid #e0e0e0 !important;
 }
 button.custom-btn { 
-    background-color: #6c5ce7 !important; /* A nice purple */
+    background-color: #6c5ce7 !important;
     color: white !important; 
     border-radius: 8px !important;
     padding: 10px 15px !important;
@@ -111,20 +111,31 @@ button.custom-btn {
 button.custom-btn:hover {
     background-color: #5a4bd7 !important;
 }
-/* Styling for the labels of Gradio components */
-.gradio-form > div > .label > span, .gradio-form > .label > span { /* More specific selector for labels */
-    background-color: #8a7ff0 !important; /* Lighter purple for label background */
+.gradio-form > div > .label > span, .gradio-form > .label > span {
+    background-color: #8a7ff0 !important;
     color: white !important;
     padding: 4px 8px !important;
     border-radius: 6px !important;
     font-size: 0.9em !important;
-    margin-bottom: 5px !important; /* Add some space below label */
+    margin-bottom: 5px !important;
     display: inline-block !important;
 }
-/* Specific styling for markdown output if needed, though inline styles are strong */
-div[data-testid="markdown"] {
+div[data-testid="markdown"] { /* Affects Markdown components */
     padding: 15px;
-    background-color: transparent; /* Ensure no conflicting background */
+    background-color: transparent; /* Ensure no conflicting background from markdown itself */
+}
+/* New styles for the main page title */
+.page-main-title-container {
+    text-align: center !important;
+    margin-bottom: 10px !important;
+    width: 100% !important;
+}
+.page-main-title-text {
+    font-size: 2.5em !important;
+    font-weight: bold !important;
+    font-family: "KaiTi", "STKaiti", "楷体", "Songti SC", "STSong", "SimSun", serif !important; /* Keep KaiTi, add robust fallbacks */
+    display: inline-block !important;
+    color: #333 !important;
 }
 """
 
@@ -133,9 +144,14 @@ with gr.Blocks(css=custom_css, theme=gr.themes.Soft(
 ).set(
     block_title_text_weight="600",
     block_label_text_weight="500",
-    # body_background_fill="#fdfcf5" 
+    body_background_fill="#fdfcf5" 
 )) as app:
-    gr.Markdown("<div style='text-align:center; margin-bottom:10px;'><span style='font-size:2.5em; font-weight:bold; font-family: \"KaiTi\", \"STKaiti\", \"楷体\", serif;'>🪶 AI 古诗生成器</span></div>")
+    gr.HTML("""
+        <div class='page-main-title-container'>
+            <h1 class='page-main-title-text'>🪶 AI 古诗生成器</h1>
+        </div>
+    """)
+    # gr.Markdown("<div style='text-align:center; margin-bottom:10px;'><span style='font-size:2.5em; font-weight:bold; font-family: \"KaiTi\", \"STKaiti\", \"楷体\", serif;'>🪶 AI 古诗生成器</span></div>")
     # gr.Markdown("<p style='text-align:center; font-size:1.1em; color:#555; margin-bottom:25px;'>输入一个诗题，选择格律，AI 将为您创作一首古诗。</p>")
     gr.Markdown("---")
 
