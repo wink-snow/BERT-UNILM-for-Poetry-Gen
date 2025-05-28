@@ -4,6 +4,11 @@ transformers==4.35.2
 torchinfo==1.8.0
 
 # deployment requirements
-fastapi
-pydantic
-pydantic-core
+# fastapi
+# pydantic
+# pydantic-core
+
+# gradio app requirements
+gradio==4.44.1
+torch
+torchvision
